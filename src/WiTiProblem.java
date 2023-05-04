@@ -6,30 +6,32 @@ public class WiTiProblem {
         final int sizeOfSearching = (int) Math.pow(2,tasks.length);
         int[] memory = new int[sizeOfSearching];
         for(int i = 1; i<memory.length; i++){
-            memory[i] = Integer.MAX_VALUE;
-            int sumPerformedTimeOfTasks = 0;
-            int maskForPermutationInMemory = 1;
-            int indexOfCurrentTask = 0;
-            int loopConstraint = i;
 
-            final List<Integer> indexesOfConsideredTasks = new ArrayList<>();
-            final List<Integer> permutationInMemory = new ArrayList<>();
+            memory[i] = Integer.MAX_VALUE;
+            int sumPerformedTimes = 0;
+            int permutationMask = 1;
+            int indexOfCurrentTask = 0;
+            int bitsConstraint = i;
+            final int currentIteration = i;
+
+            final List<Integer> taskIndexes = new ArrayList<>();
+            final List<Integer> memoryOfPermutation = new ArrayList<>();
             
-            while (loopConstraint!=0) {
-                if ((i & maskForPermutationInMemory) != 0) {
-                    sumPerformedTimeOfTasks += tasks[indexOfCurrentTask].getPerformedTime();
-                    indexesOfConsideredTasks.add(indexOfCurrentTask);
-                    permutationInMemory.add(i^maskForPermutationInMemory);
+            while (bitsConstraint!=0) {
+                if ((currentIteration & permutationMask) != 0) {
+                    sumPerformedTimes += tasks[indexOfCurrentTask].getPerformedTime();
+                    taskIndexes.add(indexOfCurrentTask);
+                    memoryOfPermutation.add(currentIteration^permutationMask);
                 }
-                loopConstraint >>= 1;
-                maskForPermutationInMemory <<= 1;
+                bitsConstraint >>= 1;
+                permutationMask <<= 1;
                 indexOfCurrentTask++;
             }
 
-            for(int j = 0; j < indexesOfConsideredTasks.size(); j++){
-                final int currentTask = indexesOfConsideredTasks.get(j);
-                final int performedTimeInMemory = permutationInMemory.get(j);
-                memory[i] = Math.min(memory[i], (Math.max(sumPerformedTimeOfTasks-tasks[currentTask].getDeadline(),0) *
+            for(int j = 0; j < taskIndexes.size(); j++){
+                final int currentTask = taskIndexes.get(j);
+                final int performedTimeInMemory = memoryOfPermutation.get(j);
+                memory[i] = Math.min(memory[i], (Math.max(sumPerformedTimes-tasks[currentTask].getDeadline(),0) *
                         tasks[currentTask].getWeight()) + memory[performedTimeInMemory]);
             }
         }
