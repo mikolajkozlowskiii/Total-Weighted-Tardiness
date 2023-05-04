@@ -21,8 +21,9 @@ public class Main {
             final int result = WiTiProblem.getMinWeightedSumOfDelays(tasks);
             final long stop = System.currentTimeMillis();
 
+            System.out.println(pathname);
             System.out.println("Result: " + result);
-            System.out.println("Time: " + (stop-start) + "ms");
+            System.out.println("Time: " + (stop-start) + "ms\n");
         }
     }
 

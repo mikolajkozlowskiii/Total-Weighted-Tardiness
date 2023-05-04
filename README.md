@@ -51,7 +51,7 @@ or the iterative approach. My implementation was written based on iteration.
 ## Implementation
 The implementation of the algorithm was written in the object-oriented Java programming language. The creation of task object instances is able to well represent tasks that have information such as the desired time to performed time, weight/punishment factor and deadline time. The structure of object respresenting the task structure is in file Task.java
 Important part of main loop in algorithm:
-```
+```java
             memory[i] = Integer.MAX_VALUE;
             int sumPerformedTimes = 0;
             int permutationMask = 1;
@@ -75,7 +75,7 @@ Important part of main loop in algorithm:
 ```
 In order to improve the performance of the program and also to simplify referring to stored values in memory, or at least counting the sum of tasks performed, I decided to use bit operations in the implementation of the algorithm. Bitwise shifts and bitwise symmetric difference were helpful.
 Bit shifts were needed indirectly for the next important operations, they gave a constraint in the while loop to check at most the number of combinations stored bitwise. If this constraint had not been shifted, the whole integer would have been considered, i.e. 32 places whether there was a 1 or 0. 32 places because the integer size is 32 bits.
-```
+```java
             while (bitsConstraint!=0) {
                // some code
                bitsConstraint >>= 1;
@@ -83,7 +83,7 @@ Bit shifts were needed indirectly for the next important operations, they gave a
 ```
 
 A mask was also created, checking by means of a bitwise conjunction operation in the if condition whether there is a 1 or 0 in the bit place under consideration. If 1, the condition was satisfied. 
-```
+```java
             while (bitsConstraint!=0) {
                 if ((currentIteration & permutationMask) != 0) {
                     // some code 
@@ -96,37 +96,27 @@ In order to find an index in memory storing the necessary pre-calculated values 
 memoryOfPermutation.add(currentIteration^permutationMask);
 ```
 _**The easiest way to understand the way of the algorithm working is the analyze the simple example in the next section.**_
-In the rest of the implementation there is a reference to the created Lists shown above. Thanks to the use of ArrayList implementation, used operations such as add() and get() have a time complexity of O(1) ( in the case of practical sizes of structures for the WiTi problem, I do not mention much larger sizes of input structures, which would cause the worst-case scenario, since for such sizes, the running time of the algorithm is unacceptable anyway).
+In the rest of the implementation there is a reference to the created Lists shown above. Thanks to the use of ArrayList implementation, used operations such as add() and get() have a time complexity of O(1) (in the case of practical sizes of structures for the WiTi problem,
+I do not mention much larger sizes of input structures, which would cause the worst-case scenario, when a new array has to be created and all the elements copied to it, since for such sizes, the running time of the algorithm is unacceptable anyway)
 
 
 ## Simple example
-0. $F(000)=0$\\\\
-1. $F(001)=max\{p_1-d_1,0\}\cdot w_1 + F(000)$\\\\
-2. $F(010)=max\{p_2-d_2,0\}\cdot w_2 + F(000)$\\\\
-3. $F(011)=min
-    \begin{cases}
-		max\{p_1+p_2-d_1,0\}\cdot w_1 + F(010)\\
-        max\{p_1+p_2-d_2,0\}\cdot w_2 + F(001)
-    \end{cases}\\\\\\
-4. $F(100)=max\{p_3-d_3,0\}\cdot w_3 + F(000)$\\\\\\
-5. $F(101)=min
-    \begin{cases}
-		max\{p_1+p_3-d_1,0\}\cdot w_1 + F(100)\\
-        max\{p_1+p_3-d_3,0\}\cdot w_3 + F(001)
-    \end{cases}
-    \Longrightarrow 
-6. $F(110)=min
-    \begin{cases}
-		max\{p_2+p_3-d_2,0\}\cdot w_2 + F(100)\\
-        max\{p_2+p_3-d_3,0\}\cdot w_3 + F(010)
-    \end{cases}
-7. $F(111)=min
-    \begin{cases}
-		max\{p_1+p_2+p_3-d_1,0\}\cdot w_1 + F(110)\\
-        max\{p_1+p_2+p_3-d_2,0\}\cdot w_2 + F(101)\\
-        max\{p_1+p_2+p_3-d_3,0\}\cdot w_3 + F(011)
-    \end{cases}$
+This is a simple example of how dynamic programming works for wiTi problem.
+It represents finding smallest possible value of the weighted sum of delays for 3 tasks. We have there
+7 iterations (0 iteration we can skip, result is always zero), because of what have been said above: time complexity is $2^{n}-1$ = $2^{3}-1$ = 7.
+Which current task is currently under computation is defined by 0 or 1.
+For example: 1. F(001) means we consider in first iteration only first task,
+the second and third are skipped (001 is readen from right to left, like in bitwise).
+We are starting from the tiniest subproblems. Then we go through bigger subproblems
+using smaller subproblems saved in memory. For example F(101) means, we consider
+only first and third task, the second is skipped. In the case of the considered 5th iteration we
+have 2 possibilities. If the 3th task is executed first, it means that the next task will
+be the 1st, so we should add the performed times of the first and third tasks and then
+compute diffrence beetween that sum and delay of first task (because first task is executed after third). This value is multiplied by weight of first task.
+Next, value from memory is added, that value was computed in previous iteration when only third task was executed like an only one task in subproblem F(100).
+Similarly, for the second possibility in the 5th iteration the calculations occurs.
+Then the smallest value is chosen to minimize the criterion of smallest possible
+value of the weighted sum of delays.
+At the 7th iteration, the situation for the main problem of the 3 tasks is considered.
 
-
-
-
+![simple__example](https://user-images.githubusercontent.com/68119685/236315458-ef1e819f-08c8-42ee-9f8b-a172373dc5ef.png)
